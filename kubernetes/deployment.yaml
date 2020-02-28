@@ -1,0 +1,45 @@
+apiVersion: apps/v1 # for versions before 1.9.0 use apps/v1beta2
+kind: Deployment
+metadata:
+  name: squid-deployment
+spec:
+  selector:
+    matchLabels:
+      deploy: squid
+  replicas: 1
+  template:
+    metadata:
+      name: squid
+      labels:
+        deploy: squid
+    spec:
+      containers:
+        - name: squid
+          image: jlandowner/squid:3.5.27-2
+          ports:
+            - containerPort: 3128
+              protocol: TCP
+          volumeMounts:
+            - mountPath: /var/spool/squid
+              name: data
+            - mountPath: /etc/squid/squid.conf
+              subPath: squid.conf
+              name: conf
+            - mountPath: /etc/squid/whitelist
+              subPath: whitelist
+              name: whitelist
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: conf
+          configMap:
+            name: squid-conf
+            items:
+              - key: squid.conf
+                path: squid.conf
+        - name: whitelist
+          configMap:
+            name: whitelist
+            items:
+              - key: whitelist
+                path: whitelist

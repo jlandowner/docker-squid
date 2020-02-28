@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: squid-conf
+data:
+  squid.conf: |
+    #Recommended minimum configuration:
+    acl all src all
+    http_access allow all
+    acl manager proto cache_object
+    acl localnet src 192.168.100.0/16 # Your local network
+    # Allow HTTP queries from local networks only
+    http_access allow localnet
+    http_access deny !localnet
+    # Whitelist Domain configuration
+    #acl whitelist dstdomain "/etc/squid/whitelist"
+    #http_access allow whitelist
+    # And finally deny all other access to this proxy
+    http_access deny all
+    # Allow ICP queries from local networks only
+    icp_access allow localnet
+    icp_access deny !localnet
+    icp_access deny all
+    # Squid normally listens to port 3128
+    http_port 3128
